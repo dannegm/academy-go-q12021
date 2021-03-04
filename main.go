@@ -14,5 +14,5 @@ func main() {
 	app.GET("/pokedex", controller.GetPokemonList(pokedex))
 	app.GET("/pokemon/:pokemonID", controller.GetPokemonByID(pokedex))
 
-	app.Run()
+	app.Run("localhost:3000")
 }
