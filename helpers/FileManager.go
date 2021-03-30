@@ -14,3 +14,8 @@ func ReadFile(filename string) (rows []string, err error) {
 	rows = strings.Split(string(content), "\n")
 	return
 }
+
+func SaveToFile(filename string, content string) error {
+	fileContent := []byte(content)
+	return ioutil.WriteFile(filename, fileContent, 0666)
+}

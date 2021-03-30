@@ -21,7 +21,7 @@ func PokedexFromFile() (pokes Pokedex, err error) {
 	pokes = make(Pokedex)
 
 	for _, row := range rows[1:167] {
-		poke, _ := PokemonFromString(row)
+		poke := PokemonFromString(row)
 
 		// Megaevolutions appears as a duplicated key, so, will skipped
 		if _, exist := pokes[poke.ID]; !exist {
