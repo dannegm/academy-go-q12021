@@ -1,5 +1,92 @@
 # Golang Bootcamp
 
+## App Information
+
+### How To Run
+
+1. Go to the file `/constants/constants.go` and change the assets path with your local folder
+2. Install dependencies with `go get`
+3. Run the program with `go run main.go`
+4. The server should start at port 3000
+
+### How To Test
+
+1. Make sure to define your local path int the constants file
+2. Move to the folder `/modals`
+3. Run `go test` in your terminal
+
+### Available Endpoints
+
+*GET* `/pokedex` Return a list of first 151 pokemon (frist gen)
+
+Response
+```json
+{
+  data: [
+    {
+      id: 1,
+      name: "Bulbasaur",
+      typeOne: "Grass",
+      total: 318,
+      healthPoints: 45,
+      attack: 49,
+      defense: 49,
+      speed: 65
+    },
+    ...
+  ]
+}
+```
+
+*GET* `/pokemon/:pokemonID` Return a single pokemon by `pokemonID`
+
+Response of `/pokemon/1`
+```json
+{
+  data: {
+      id: 1,
+      name: "Bulbasaur",
+      typeOne: "Grass",
+      total: 318,
+      healthPoints: 45,
+      attack: 49,
+      defense: 49,
+      speed: 65
+    }
+}
+```
+
+*GET* `/fetchData` Fetch all first 151 pokemon from [PokeApi](https://pokeapi.co/)
+
+Response `204 Not Content`
+
+*GET* `/pokedex/worker` Return a list of pokemon using go routines
+
+Query Params
+
+  * `items` - Number of received items, `50` by default
+  * `items_per_worker` - Number of items to process in a thread, `10` by default
+  * `type` (__odd__ / __even__) - The filter applied to the ID field, `even` by default
+
+Response
+```json
+{
+  data: [
+    {
+      id: 1,
+      name: "Bulbasaur",
+      typeOne: "Grass",
+      total: 318,
+      healthPoints: 45,
+      attack: 49,
+      defense: 49,
+      speed: 65
+    },
+    ...
+  ]
+}
+```
+
 ## Introduction
 
 Thank you for participating in the Golang Bootcamp course!
