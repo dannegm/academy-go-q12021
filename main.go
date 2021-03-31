@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/dannegm/academy-go-q12021/controller"
 	"github.com/dannegm/academy-go-q12021/models"
 
@@ -9,7 +11,11 @@ import (
 
 func main() {
 	// Read pokemons from CSV File
-	pokedex, _ := models.PokedexFromFile()
+	pokedex, err := models.PokedexFromFile()
+
+	if err != nil {
+		fmt.Println("There was an error reading pokedex file")
+	}
 
 	// Create server instance
 	app := gin.Default()

@@ -252,7 +252,7 @@ type PokemonApi struct {
 
 // PokemonToCsvRow convert a pokemon structure to a string
 func PokemonToCsvRow(p Pokemon) string {
-	rowModel := [9]string{
+	rowModel := [8]string{
 		strconv.Itoa(p.ID),
 		p.Name,
 		p.TypeOne,

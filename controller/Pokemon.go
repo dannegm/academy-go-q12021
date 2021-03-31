@@ -6,6 +6,7 @@ import (
 
 	"github.com/dannegm/academy-go-q12021/helpers"
 	"github.com/dannegm/academy-go-q12021/models"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,6 +40,7 @@ func GetPokemonList(pokedex models.Pokedex) func(*gin.Context) {
 	}
 }
 
+// GetPokemonFromAPI get a pokemon from PokeAPI
 func GetPokemonFromAPI(pokemonID int) error {
 	pokeID := strconv.Itoa(pokemonID)
 	URL := "https://pokeapi.co/api/v2/pokemon/" + pokeID
@@ -83,17 +85,17 @@ func GetPokemonByID(pokedex models.Pokedex) func(*gin.Context) {
 	}
 }
 
+// FetchPokemonFromApi get first 150 pokemon from PokeAPI
 func FetchPokemonFromApi() func(*gin.Context) {
 	return func(context *gin.Context) {
-
 		for pokemonID := 1; pokemonID < 150; pokemonID++ {
 			GetPokemonFromAPI(pokemonID)
 		}
-
 		context.Abort()
 	}
 }
 
+// GetPokemonListWIthConcurrency to get a list of pokemon filtered by ID if is odd or even
 func GetPokemonListWIthConcurrency(pokedex models.Pokedex) func(*gin.Context) {
 	return func(context *gin.Context) {
 		messages := []string{}

@@ -1,7 +1,6 @@
 package models_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/dannegm/academy-go-q12021/models"
@@ -19,11 +18,11 @@ func TestPokemonToCsvRow(t *testing.T) {
 		Speed:        45,
 	}
 
-	expected := "1,bulbasaur,grass,poison,64,45,49,49,45\n"
+	expected := "1,bulbasaur,grass,64,45,49,49,45\n"
 	result := models.PokemonToCsvRow(input)
 
 	if expected != result {
-		t.Error("Expected 1,bulbasaur,grass,poison,64,45,49,49,45, recieved: " + result)
+		t.Error("Expected 1,bulbasaur,grass,64,45,49,49,45, recieved: " + result)
 	}
 }
 
@@ -59,9 +58,15 @@ func TestStorePokemonInCsv(t *testing.T) {
 		Speed:        45,
 	}
 	expected := models.StorePokemonInCsv(input)
-	fmt.Println(expected)
 
 	if expected != nil {
 		t.Error("Can't store in a file")
 	}
 }
+
+/*
+ * TODO: I need to learn how to mock
+ * long content structures in a easy way
+ */
+// func TestMapPokemonApi(t *testing.T) {
+// }
