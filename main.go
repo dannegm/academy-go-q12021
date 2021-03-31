@@ -22,7 +22,7 @@ func main() {
 	app.GET("/pokedex", controller.GetPokemonList(pokedex))
 	app.GET("/pokemon/:pokemonID", controller.GetPokemonByID(pokedex))
 	app.GET("/fetchData", controller.FetchPokemonFromApi())
-	app.GET("/worker/pokedex", controller.GetAllPokemonWIthConcurrency(pokedex))
+	app.GET("/pokedex/worker", controller.GetPokemonListWIthConcurrency(pokedex))
 
 	// Mounting server - localhost to avoid networks dialogs
 	app.Run("localhost:3000")

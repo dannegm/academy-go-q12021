@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"sync"
@@ -99,67 +99,108 @@ func FetchPokemonFromApi() func(*gin.Context) {
 	}
 }
 
-func GetAllPokemonWIthConcurrency(pokedex models.Pokedex) func(*gin.Context) {
+func GetPokemonListWIthConcurrency(pokedex models.Pokedex) func(*gin.Context) {
 	return func(context *gin.Context) {
-
 		messages := []string{}
 
-		items_per_worker, err := strconv.Atoi(context.DefaultQuery("items_per_worker", ""))
+		items_per_worker, err := strconv.Atoi(context.DefaultQuery("items_per_worker", "10"))
 		if err != nil {
 			messages = append(messages, "Invalid items_per_worker")
 		}
 
-		items, err := strconv.Atoi(context.DefaultQuery("items", ""))
+		items, err := strconv.Atoi(context.DefaultQuery("items", "150"))
 		if err != nil {
 			messages = append(messages, "Invalid items")
 		}
 
-		typeQuery := context.DefaultQuery("type", "")
+		if len(messages) > 0 {
+			context.JSON(http.StatusBadRequest, ErrorResponse{
+				Status:  http.StatusBadRequest,
+				Message: messages[0],
+			})
+		}
 
-		// Create the channel for sharing results.
-		values := make(chan int)
+		evenOdd := context.DefaultQuery("type", "even")
 
+		// Create the channel for sharing pokemons.
+		pokemonChannel := make(chan models.Pokemon)
 		// Create a channel "shutdown" to tell goroutines when to terminate.
 		shutdown := make(chan struct{})
 
-		// Define the size of the worker pool. Use runtime.GOMAXPROCS(0) to size the pool based on number of processors.
-		poolSize := items / items_per_worker
+		// Define the size of the worker pool.
+		// chunk total items to process by items_per_worker
+		poolSize := int(math.Ceil(float64(items) / float64(items_per_worker)))
 
 		// Create a sync.WaitGroup to monitor the Goroutine pool. Add the count.
 		var wg sync.WaitGroup
 		wg.Add(poolSize)
 
-		// Create a fixed size pool of goroutines to generate random numbers.
+		// Limit of pokemons available
+		pokemonsAvailable := len(pokedex)
+
+		// Create a fixed size pool of goroutines to retrive pokemons
 		for i := 0; i < poolSize; i++ {
+			// starts go rutine
 			go func(id int) {
+				// get the start pokemonID base on the items per worker and the current thread
+				pokemonID := (items_per_worker * id)
 
+				// Infinite loop to fetch pokemons
 				for {
+					// increment the pokemon id to find the next pokemon available
+					if pokemonsAvailable > pokemonID {
+						pokemonID++
+					}
 
-					// Generate a random number up to 1000.
-					n := items_per_worker
+					// get the current pokemon
+					poke := pokedex[pokemonID]
 
-					// Use a select to either send the number or receive the shutdown signal.
 					select {
+					// inject current pokemon to the cannel
+					case pokemonChannel <- poke:
 
-					// In one case send the random number.
-					case values <- n:
-						// Lo que ejecuta mi worker
-
-						if typeQuery != "odd" && n%2 != 0 {
-							// TODO: Sacar a poke del worker
-							poke := pokedex[n]
-						}
-
-					// In another case receive from the shutdown channel.
+					// exit of gorutine
 					case <-shutdown:
-						fmt.Printf("Worker %d shutting down\n", id)
 						wg.Done()
 						return
 					}
 				}
-
 			}(i)
 		}
 
+		// Create a slice to hold the selected pokemon.
+		pokedexPool := PokedexList{}
+		// iterate channel to generate the pool
+		for poke := range pokemonChannel {
+
+			if evenOdd == "even" && poke.ID%2 != 0 {
+				pokedexPool = append(pokedexPool, poke)
+			}
+
+			if evenOdd == "odd" && poke.ID%2 == 0 {
+				pokedexPool = append(pokedexPool, poke)
+			}
+
+			// break the loop once we reach the limit of the list
+			if len(pokedexPool) == pokemonsAvailable {
+				break
+			}
+
+			// break the loop once we reach the items requested
+			if len(pokedexPool) == items {
+				break
+			}
+		}
+
+		// Send the shutdown signal by closing the channel.
+		close(shutdown)
+
+		// Wait for the Goroutines to finish.
+		wg.Wait()
+
+		// Send the pokemonChannel as response
+		context.JSON(http.StatusOK, PokemonListResponse{
+			Pokedex: pokedexPool,
+		})
 	}
 }
