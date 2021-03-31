@@ -100,7 +100,7 @@ func GetPokemonListWIthConcurrency(pokedex models.Pokedex) func(*gin.Context) {
 	return func(context *gin.Context) {
 		messages := []string{}
 
-		items, err := strconv.Atoi(context.DefaultQuery("items", "150"))
+		items, err := strconv.Atoi(context.DefaultQuery("items", "50"))
 		if err != nil {
 			messages = append(messages, "Invalid items")
 		}
